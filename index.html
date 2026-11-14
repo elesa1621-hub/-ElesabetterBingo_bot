@@ -1,0 +1,476 @@
+
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TrustBINGO</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #edf1f8;
+    color: #18243a;
+}
+
+.header {
+    background: #1c293e;
+    color: white;
+    padding: 18px;
+    text-align: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 27px;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: #202d43;
+    color: white;
+    padding: 16px 5px;
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 22px;
+    margin-top: 6px;
+}
+
+.green {
+    color: #36d68b;
+}
+
+.yellow {
+    color: #ffcc35;
+}
+
+.container {
+    max-width: 850px;
+    margin: 20px auto;
+    padding: 12px;
+}
+
+.rooms {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.room {
+    flex: 1;
+    display: block;
+    text-align: center;
+    padding: 17px 8px;
+    border-radius: 12px;
+    background: white;
+    border: 2px solid #d6dce7;
+    color: #18243a;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.room.active {
+    border-color: #20a45a;
+    background: #e5f8ec;
+}
+
+.room small {
+    display: block;
+    margin-top: 6px;
+}
+
+.game-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 3px 12px #00000012;
+}
+
+.game-title {
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.bingo-header,
+.number-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+}
+
+.bingo-header div {
+    padding: 12px 2px;
+    text-align: center;
+    color: white;
+    font-size: 21px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.b { background: #2865d8; }
+.i { background: #e52d35; }
+.n { background: #e9b51d; }
+.g { background: #159b51; }
+.o { background: #8838dc; }
+
+.number {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #cbd3df;
+    border-radius: 6px;
+    font-size: 19px;
+    font-weight: bold;
+    box-shadow: 0 1px 3px #00000015;
+}
+
+.number.drawn {
+    background: #ffc928;
+    border-color: #e2a900;
+    color: #172033;
+}
+
+.recent {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f1f4fa;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.recent-ball {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin: 5px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    font-size: 17px;
+    background: #2865d8;
+}
+
+.status {
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+/* AMHARIC GAME RULES */
+
+.game-rules {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 22px;
+    box-shadow: 0 3px 12px #00000012;
+    text-align: center;
+}
+
+.game-rules h2 {
+    color: #164e8a;
+    margin-top: 0;
+    font-size: 22px;
+}
+
+.rule-line {
+    color: #164e8a;
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+.rule-description {
+    font-size: 17px;
+    font-weight: bold;
+    line-height: 1.9;
+}
+
+.bingo-pattern {
+    background: #f4f7fb;
+    padding: 12px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+.bingo-pattern pre {
+    display: inline-block;
+    text-align: left;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #172033;
+    white-space: pre;
+    margin: 0;
+}
+
+.prize-rule {
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff3cd;
+    border-radius: 10px;
+    font-weight: bold;
+    line-height: 1.9;
+}
+
+.footer {
+    text-align: center;
+    color: #6d788a;
+    padding: 25px 10px;
+    font-size: 13px;
+}
+
+@media(max-width: 450px) {
+    .number {
+        min-height: 43px;
+        font-size: 16px;
+    }
+
+    .bingo-header,
+    .number-grid {
+        gap: 5px;
+    }
+
+    .stats {
+        font-size: 12px;
+    }
+
+    .stat strong {
+        font-size: 18px;
+    }
+
+    .bingo-pattern pre {
+        font-size: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🎯 TrustBINGO</h1>
+    <p>Welcome to TrustBINGO</p>
+</div>
+
+<div class="stats">
+    <div class="stat">
+        DERASH
+        <strong class="green" id="prizePool">0 ETB</strong>
+    </div>
+
+    <div class="stat">
+        BALLS
+        <strong id="ballCount">0/75</strong>
+    </div>
+
+    <div class="stat">
+        PLAYERS
+        <strong class="yellow" id="players">0</strong>
+    </div>
+</div>
+
+<div class="container">
+
+    <h2>Choose Your Room</h2>
+
+    <div class="rooms">
+
+        <a href="/?stake=10&user_id={{ user_id|default('')|urlencode }}"
+           class="room {% if stake == 10 %}active{% endif %}">
+            🎮 GoodBingo
+            <small>10 ETB</small>
+        </a>
+
+        <a href="/?stake=50&user_id={{ user_id|default('')|urlencode }}"
+           class="room {% if stake == 50 %}active{% endif %}">
+            🏆 SuperBingo
+            <small>50 ETB</small>
+        </a>
+
+    </div>
+
+    <div class="game-card">
+
+        <div class="game-title">
+            {{ room_name|default('BINGO NUMBER BOARD') }}
+        </div>
+
+        <div class="bingo-header">
+            <div class="b">B</div>
+            <div class="i">I</div>
+            <div class="n">N</div>
+            <div class="g">G</div>
+            <div class="o">O</div>
+        </div>
+
+        <div class="number-grid" id="numberGrid">
+            {% for n in range(1, 76) %}
+                <div class="number" id="number-{{ n }}">
+                    {{ n }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="recent">
+            <strong>RECENTLY DRAWN NUMBERS</strong>
+
+            <div id="recentNumbers">
+                Waiting for numbers...
+            </div>
+        </div>
+
+        <div class="status" id="gameStatus">
+            Waiting for the administrator to start the game.
+        </div>
+
+    </div>
+
+    <!-- AMHARIC GAME RULES -->
+    <section class="game-rules">
+
+        <h2>🎯 የጨዋታ ህጎች (Game Rules)</h2>
+
+        <div class="rule-line">
+            ━━━━━━━━━━━━━━━━━━
+        </div>
+
+        <p class="rule-description">
+            ጨዋታውን ለማሸነፍ በተፈለገበት አንድ መስመር
+            ወይም አራቱን ኮርነሮች ቀድሞ ማግኘት
+        </p>
+
+        <div class="bingo-pattern">
+
+<pre>
+  B  I  N  G  O
++-----+----+-----+
+|✅  ✅  ✅  ✅  ✅|  &lt;- መስመር
++                +
+|                |
++                +
+|                |
++                +
+|                |
++-----+----+-----+
+
+  B  I  N  G  O
++-----+----+-----+
+|✅           ✅|  &lt;- 4 ኮርነሮች
++                +
+|                |
++                +
+|                |
++                +
+|✅           ✅|
++-----+----+-----+
+</pre>
+
+        </div>
+
+        <div class="prize-rule">
+            💰 ከአንድ በላይ አሸናፊ ካለ ደራሽ ገንዘቡን
+            ይከፋፈላሉ
+        </div>
+
+    </section>
+
+</div>
+
+<div class="footer">
+    TrustBINGO | Good luck! 🍀
+</div>
+
+<script>
+const selectedStake = {{ stake|tojson }};
+
+async function updateGame() {
+    try {
+        const response = await fetch(
+            `/api/game?stake=${selectedStake}`,
+            { cache: "no-store" }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return;
+        }
+
+        const drawn = data.drawn || [];
+
+        document.getElementById("ballCount").textContent =
+            `${drawn.length}/75`;
+
+        document.getElementById("players").textContent =
+            data.players || 0;
+
+        document.getElementById("prizePool").textContent =
+            `${data.prize_pool || 0} ETB`;
+
+        // Reset all 75 numbers
+        for (let n = 1; n <= 75; n++) {
+            const cell = document.getElementById(`number-${n}`);
+
+            if (cell) {
+                cell.classList.remove("drawn");
+            }
+        }
+
+        // Highlight drawn numbers
+        drawn.forEach(number => {
+            const cell = document.getElementById(
+                `number-${number}`
+            );
+
+            if (cell) {
+                cell.classList.add("drawn");
+            }
+        });
+
+        // Show latest five numbers
+        const recent = drawn.slice(-5).reverse();
+
+        document.getElementById("recentNumbers").innerHTML =
+            recent.length
+                ? recent.map(n =>
+                    `<span class="recent-ball">${n}</span>`
+                  ).join("")
+                : "Waiting for numbers...";
+
+        document.getElementById("gameStatus").textContent =
+            data.active
+                ? "🎮 GAME IN PROGRESS"
+                : "⏳ WAITING FOR THE NEXT GAME";
+
+    } catch (error) {
+        console.error("Unable to update game:", error);
+    }
+}
+
+updateGame();
+setInterval(updateGame, 5000);
+</script>
+
+</body>
+</html>

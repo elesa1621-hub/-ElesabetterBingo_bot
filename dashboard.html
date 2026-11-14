@@ -1,0 +1,739 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="60">
+
+    <title>TrustBINGO Admin Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #263238;
+        }
+
+        header {
+            background: #142d4e;
+            color: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header h1 { font-size: 24px; }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-actions a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+        }
+
+        .refresh { background: #1976d2; }
+        .logout { background: #d9534f; }
+
+        .container {
+            width: 95%;
+            max-width: 1500px;
+            margin: 25px auto;
+        }
+
+        .flash-message {
+            padding: 13px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            background: #e1f3e5;
+            color: #17652c;
+            border: 1px solid #b8dfc0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card, .section, .room-card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .stat-card h3 {
+            color: #687789;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card h2 {
+            font-size: 25px;
+            color: #142d4e;
+            overflow-wrap: anywhere;
+        }
+
+        .section { margin-bottom: 25px; }
+
+        .section h2 {
+            margin-bottom: 18px;
+            color: #142d4e;
+            font-size: 20px;
+        }
+
+        .section h3 {
+            margin: 18px 0 12px;
+            color: #142d4e;
+        }
+
+        .section p, .room-card p { margin: 9px 0; }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .good-room { border-top: 5px solid #238b45; }
+        .super-room { border-top: 5px solid #1976d2; }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e5e9ef;
+            padding: 13px 11px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background: #edf2f8;
+            color: #142d4e;
+            white-space: nowrap;
+        }
+
+        tr:hover { background: #f8fafc; }
+
+        input, select {
+            padding: 9px;
+            border: 1px solid #ccd3dc;
+            border-radius: 5px;
+            min-width: 75px;
+        }
+
+        button {
+            border: none;
+            padding: 10px 13px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            margin: 3px;
+        }
+
+        button:hover { opacity: 0.85; }
+
+        .btn-blue { background: #1976d2; }
+        .btn-green { background: #238b45; }
+        .btn-red { background: #d9534f; }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #fff0ce;
+            color: #895900;
+        }
+
+        .status-active {
+            background: #dff5e5;
+            color: #17652c;
+        }
+
+        .game-number {
+            display: inline-block;
+            background: #e8f1ff;
+            color: #174f91;
+            padding: 9px;
+            margin: 4px;
+            border-radius: 50%;
+            min-width: 36px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+
+        .form-row, .credit-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .credit-form { min-width: 260px; }
+
+        .inline-form {
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .room-actions {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .room-start-form {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e9ef;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 19px; }
+            .section, .room-card { padding: 14px; }
+            .stat-card h2 { font-size: 21px; }
+            .header-actions { width: 100%; }
+
+            .header-actions a {
+                text-align: center;
+                flex: 1;
+            }
+
+            .form-row {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .form-row input,
+            .form-row button,
+            .form-row select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎯 TrustBINGO Admin Dashboard</h1>
+
+    <div class="header-actions">
+        <a href="{{ url_for('dashboard') }}" class="refresh">Refresh</a>
+        <a href="{{ url_for('admin_logout') }}" class="logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <!-- STATISTICS -->
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h3>Registered Players</h3>
+            <h2>{{ total_players|default(0) }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Pending Requests</h3>
+            <h2>{{ pending_count|default(0) }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Player Credit</h3>
+            <h2>
+                {{ "%.2f"|format(total_credit|default(0)|float) }}
+                {{ currency|default('ETB') }}
+            </h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>GoodBingo Status</h3>
+            <h2>{{ 'Active' if good_game else 'Inactive' }}</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>SuperBingo Status</h3>
+            <h2>{{ 'Active' if super_game else 'Inactive' }}</h2>
+        </div>
+
+    </div>
+
+    <!-- TWO INDEPENDENT BINGO ROOMS -->
+
+    <div class="section">
+
+        <h2>🎮 Independent Bingo Room Management</h2>
+
+        <div class="rooms-grid">
+
+            <!-- GOODBINGO: 10 ETB -->
+
+            <div class="room-card good-room">
+
+                <h2>🟢 GoodBingo — 10 ETB</h2>
+
+                {% if good_game %}
+
+                    <p><strong>Game ID:</strong> #{{ good_game.id }}</p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="status status-active">
+                            {{ good_game.status }}
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Entry Fee:</strong>
+                        {{ good_game.entry_fee }} {{ currency|default('ETB') }}
+                    </p>
+
+                    <p>
+                        <strong>Prize Pool:</strong>
+                        {{ good_game.prize_pool }}
+                        {{ currency|default('ETB') }}
+                    </p>
+
+                    <p>
+                        <strong>Prize Percentage:</strong>
+                        {{ good_game.prize_percent }}%
+                    </p>
+
+                    <p>
+                        <strong>Cards Sold:</strong>
+                        {{ good_cards_count|default(0) }}
+                    </p>
+
+                    <h3>Drawn Numbers ({{ good_drawn|length }}/75)</h3>
+
+                    <div>
+                        {% for number in good_drawn %}
+                            <span class="game-number">{{ number }}</span>
+                        {% else %}
+                            <p class="empty">No numbers drawn yet.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="room-actions">
+
+                        <form method="POST"
+                              action="{{ url_for('draw_number') }}"
+                              class="inline-form"
+                              onsubmit="return confirm('Draw a GoodBingo number?');">
+
+                            <input type="hidden" name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <input type="hidden" name="entry_fee" value="10">
+
+                            <button type="submit" class="btn-blue">
+                                🎲 Draw Number
+                            </button>
+                        </form>
+
+                        <form method="POST"
+                              action="{{ url_for('end_game') }}"
+                              class="inline-form"
+                              onsubmit="return confirm('End GoodBingo?');">
+
+                            <input type="hidden" name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <input type="hidden" name="entry_fee" value="10">
+
+                            <button type="submit" class="btn-red">
+                                End GoodBingo
+                            </button>
+                        </form>
+
+                    </div>
+
+                {% else %}
+
+                    <p><strong>Status:</strong> No active GoodBingo game.</p>
+
+                {% endif %}
+
+                {% if not good_game %}
+                    <form method="POST"
+                          action="{{ url_for('start_game') }}"
+                          class="room-start-form"
+                          onsubmit="return confirm('Start GoodBingo for 10 ETB?');">
+
+                        <input type="hidden" name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden" name="entry_fee" value="10">
+
+                        <label>Prize Percentage:</label>
+
+                        <input type="number"
+                               name="prize_percent"
+                               min="0"
+                               max="100"
+                               value="{{ prize_percent|default(80) }}"
+                               required>
+
+                        <button type="submit" class="btn-green">
+                            ▶ Start GoodBingo
+                        </button>
+                    </form>
+                {% endif %}
+
+            </div>
+
+            <!-- SUPERBINGO: 50 ETB -->
+
+            <div class="room-card super-room">
+
+                <h2>🔵 SuperBingo — 50 ETB</h2>
+
+                {% if super_game %}
+
+                    <p><strong>Game ID:</strong> #{{ super_game.id }}</p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="status status-active">
+                            {{ super_game.status }}
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Entry Fee:</strong>
+                        {{ super_game.entry_fee }} {{ currency|default('ETB') }}
+                    </p>
+
+                    <p>
+                        <strong>Prize Pool:</strong>
+                        {{ super_game.prize_pool }}
+                        {{ currency|default('ETB') }}
+                    </p>
+
+                    <p>
+                        <strong>Prize Percentage:</strong>
+                        {{ super_game.prize_percent }}%
+                    </p>
+
+                    <p>
+                        <strong>Cards Sold:</strong>
+                        {{ super_cards_count|default(0) }}
+                    </p>
+
+                    <h3>Drawn Numbers ({{ super_drawn|length }}/75)</h3>
+
+                    <div>
+                        {% for number in super_drawn %}
+                            <span class="game-number">{{ number }}</span>
+                        {% else %}
+                            <p class="empty">No numbers drawn yet.</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="room-actions">
+
+                        <form method="POST"
+                              action="{{ url_for('draw_number') }}"
+                              class="inline-form"
+                              onsubmit="return confirm('Draw a SuperBingo number?');">
+
+                            <input type="hidden" name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <input type="hidden" name="entry_fee" value="50">
+
+                            <button type="submit" class="btn-blue">
+                                🎲 Draw Number
+                            </button>
+                        </form>
+
+                        <form method="POST"
+                              action="{{ url_for('end_game') }}"
+                              class="inline-form"
+                              onsubmit="return confirm('End SuperBingo?');">
+
+                            <input type="hidden" name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <input type="hidden" name="entry_fee" value="50">
+
+                            <button type="submit" class="btn-red">
+                                End SuperBingo
+                            </button>
+                        </form>
+
+                    </div>
+
+                {% else %}
+
+                    <p><strong>Status:</strong> No active SuperBingo game.</p>
+
+                {% endif %}
+
+                {% if not super_game %}
+                    <form method="POST"
+                          action="{{ url_for('start_game') }}"
+                          class="room-start-form"
+                          onsubmit="return confirm('Start SuperBingo for 50 ETB?');">
+
+                        <input type="hidden" name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden" name="entry_fee" value="50">
+
+                        <label>Prize Percentage:</label>
+
+                        <input type="number"
+                               name="prize_percent"
+                               min="0"
+                               max="100"
+                               value="{{ prize_percent|default(80) }}"
+                               required>
+
+                        <button type="submit" class="btn-green">
+                            ▶ Start SuperBingo
+                        </button>
+                    </form>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PLAYER MANAGEMENT -->
+
+    <div class="section">
+
+        <h2>👥 Registered Players (Last 100)</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Telegram ID</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Phone Number</th>
+                        <th>Credit</th>
+                        <th>Credit Management</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for p in players %}
+
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.telegram_id }}</td>
+                        <td>{{ '@' ~ p.username if p.username else 'No Username' }}</td>
+                        <td>{{ p.full_name or 'Not Registered' }}</td>
+                        <td>{{ p.phone_number or 'Not Registered' }}</td>
+
+                        <td>
+                            <strong>
+                                {{ "%.2f"|format(p.balance|default(0)|float) }}
+                                {{ currency|default('ETB') }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('manage_credit') }}"
+                                  class="credit-form"
+                                  onsubmit="return confirm('Confirm this credit adjustment?');">
+
+                                <input type="hidden" name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <input type="hidden"
+                                       name="player_id"
+                                       value="{{ p.id }}">
+
+                                <input type="number"
+                                       name="amount"
+                                       min="1"
+                                       step="1"
+                                       placeholder="Amount"
+                                       required>
+
+                                <select name="action" required>
+                                    <option value="add">Add</option>
+                                    <option value="deduct">Deduct</option>
+                                </select>
+
+                                <button type="submit" class="btn-blue">
+                                    Update
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="7" class="empty">
+                            No registered players found.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- DEPOSIT MANAGEMENT -->
+
+    <div class="section">
+
+        <h2>💰 Pending Payment Requests</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Player ID</th>
+                        <th>Amount</th>
+                        <th>Reference</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for req in pending %}
+
+                    <tr>
+                        <td>{{ req.id }}</td>
+                        <td>{{ req.player_id }}</td>
+
+                        <td>
+                            {{ req.amount }} {{ currency|default('ETB') }}
+                        </td>
+
+                        <td>{{ req.reference or '-' }}</td>
+
+                        <td>
+                            <span class="status">{{ req.status }}</span>
+                        </td>
+
+                        <td>{{ req.created_at or '-' }}</td>
+
+                        <td>
+
+                            <form method="POST"
+                                  action="{{ url_for('approve_payment', req_id=req.id) }}"
+                                  class="inline-form"
+                                  onsubmit="return confirm('Approve this payment?');">
+
+                                <input type="hidden" name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <button type="submit" class="btn-green">
+                                    Approve
+                                </button>
+                            </form>
+
+                            <form method="POST"
+                                  action="{{ url_for('reject_payment', req_id=req.id) }}"
+                                  class="inline-form"
+                                  onsubmit="return confirm('Reject this payment?');">
+
+                                <input type="hidden" name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <button type="submit" class="btn-red">
+                                    Reject
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="7" class="empty">
+                            No pending payment requests.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    TrustBINGO Administration System
+</footer>
+
+</body>
+</html>
